@@ -13,6 +13,8 @@ export async function registerUser(username: string, email: string, password: st
 export async function loginUser(email: string, password: string) {
   const user = await User.findOne({ email });
   if (!user) throw { status: 400, message: 'Invalid credentials' };
+  // Users created via Google OAuth won't have a local password
+  if (!user.password) throw { status: 400, message: 'Please login with Google' };
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw { status: 400, message: 'Invalid credentials' };
   const u = user as IUser;
