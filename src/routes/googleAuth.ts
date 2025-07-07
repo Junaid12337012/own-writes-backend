@@ -5,10 +5,14 @@ import User from '../models/User';
 
 const router = Router();
 
-// Google client ID from frontend – ideally move to env
-const client = new OAuth2Client(
-  '680039816790-q52cvolg5kbr40tep06djvk0vf4me72k.apps.googleusercontent.com'
-);
+// Google client ID(s) – read from env, comma-separated to support multiple origins
+const GOOGLE_CLIENT_IDS = (process.env.GOOGLE_CLIENT_ID || '').split(',').map(id => id.trim()).filter(Boolean);
+
+if (GOOGLE_CLIENT_IDS.length === 0) {
+  console.warn('⚠️  GOOGLE_CLIENT_ID is not set – Google auth routes will fail');
+}
+
+const client = new OAuth2Client();
 
 router.post('/google', async (req, res) => {
   const { idToken } = req.body;
@@ -18,7 +22,7 @@ router.post('/google', async (req, res) => {
     // 1. Verify idToken with Google
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: client._clientId,
+      audience: GOOGLE_CLIENT_IDS,
     });
     const payload = ticket.getPayload();
     if (!payload) throw new Error('Bad token');
