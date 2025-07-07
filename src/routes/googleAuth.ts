@@ -7,7 +7,7 @@ const router = Router();
 
 // Google client ID from frontend – ideally move to env
 const client = new OAuth2Client(
-  '368335960912-gq3e1nk2ir2o21bl1qaqckh1jeudgtj4.apps.googleusercontent.com'
+  '680039816790-q52cvolg5kbr40tep06djvk0vf4me72k.apps.googleusercontent.com'
 );
 
 router.post('/google', async (req, res) => {
