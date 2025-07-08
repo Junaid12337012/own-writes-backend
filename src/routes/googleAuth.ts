@@ -6,6 +6,7 @@ import User from '../models/User';
 const router = Router();
 
 // Google client ID(s) – read from env, comma-separated to support multiple origins
+console.log('🔍 GOOGLE_CLIENT_ID env raw:', process.env.GOOGLE_CLIENT_ID);
 const GOOGLE_CLIENT_IDS = (process.env.GOOGLE_CLIENT_ID || '').split(',').map(id => id.trim()).filter(Boolean);
 
 if (GOOGLE_CLIENT_IDS.length === 0) {
@@ -20,10 +21,10 @@ router.post('/google', async (req, res) => {
 
   try {
     // 1. Verify idToken with Google
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: GOOGLE_CLIENT_IDS,
-    });
+    const verifyOpts: any = { idToken };
+    if (GOOGLE_CLIENT_IDS.length) verifyOpts.audience = GOOGLE_CLIENT_IDS;
+
+    const ticket = await client.verifyIdToken(verifyOpts);
     const payload = ticket.getPayload();
     if (!payload) throw new Error('Bad token');
 
