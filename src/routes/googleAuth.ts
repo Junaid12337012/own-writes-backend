@@ -16,8 +16,11 @@ if (GOOGLE_CLIENT_IDS.length === 0) {
 const client = new OAuth2Client();
 
 router.post('/google', async (req, res) => {
-  const { idToken } = req.body;
-  if (!idToken) return res.status(400).json({ msg: 'Missing idToken' });
+  // Accept idToken under different field names coming from various Google SDKs
+  const idToken: string | undefined = req.body.idToken || req.body.credential || req.body.token;
+  if (!idToken) {
+    return res.status(400).json({ msg: 'Missing idToken' });
+  }
 
   try {
     // 1. Verify idToken with Google
