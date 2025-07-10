@@ -56,9 +56,15 @@ router.post('/google', async (req, res) => {
     );
 
     res.json({ user: safeUser, token });
-  } catch (err) {
-    console.error('Google auth error:', err);
-    res.status(401).json({ msg: 'Invalid Google token' });
+  } catch (err: any) {
+    // Detailed logging to help diagnose 401 issues (audience mismatch, expired token, etc.)
+    console.error('Google auth error – detailed', {
+      message: err?.message,
+      name: err?.name,
+      errors: err?.errors,
+      stack: err?.stack,
+    });
+    res.status(401).json({ msg: 'Invalid Google token', detail: err?.message });
   }
 });
 
