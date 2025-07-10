@@ -13,6 +13,8 @@ if (GOOGLE_CLIENT_IDS.length === 0) {
   console.warn('⚠️  GOOGLE_CLIENT_ID is not set – Google auth routes will fail');
 }
 
+// Fallback secrets for local development if env vars are missing
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
 const client = new OAuth2Client();
 
 router.post('/google', async (req, res) => {
@@ -44,13 +46,16 @@ router.post('/google', async (req, res) => {
     ).lean();
 
     // 3. Issue JWT for frontend
+    // Convert _id into plain string for frontend localStorage compatibility
+    const safeUser = { ...user, _id: (user._id as any).toString() };
+
     const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
+      { id: safeUser._id, role: safeUser.role },
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.json({ user, token });
+    res.json({ user: safeUser, token });
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(401).json({ msg: 'Invalid Google token' });

@@ -9,6 +9,10 @@ import routes from './routes';
 
 // Load env vars
 dotenv.config({ debug: false });
+// Ensure JWT_SECRET exists (development fallback)
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'dev_jwt_secret_change_me';
+}
 // Normalize keys in case .env was saved with UTF-8 BOM (\uFEFF)
 for (const k of Object.keys(process.env)) {
   const cleanKey = k.replace(/^\uFEFF/, '');
