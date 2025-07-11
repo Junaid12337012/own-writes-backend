@@ -41,7 +41,8 @@ router.post('/google', async (req, res) => {
         email: payload.email,
         name: payload.name,
         avatar: payload.picture,
-      },
+        username: payload.email ? payload.email.split('@')[0] : undefined,
+      }
       { new: true, upsert: true, setDefaultsOnInsert: true }
     ).lean();
 
