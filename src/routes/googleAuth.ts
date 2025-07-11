@@ -48,7 +48,7 @@ router.post('/google', async (req, res) => {
 
     // 3. Issue JWT for frontend
     // Convert _id into plain string for frontend localStorage compatibility
-    const safeUser = { ...user, _id: (user._id as any).toString() };
+    const safeUser = { ...user, _id: (user._id as any).toString(), profilePictureUrl: (user as any).avatar };
 
     const token = jwt.sign(
       { id: safeUser._id, role: safeUser.role },
