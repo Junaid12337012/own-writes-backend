@@ -65,6 +65,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Health check route
+app.get('/ping', (req, res) => {
+  res.status(200).send('PONG ✅');
+});
+
+
 // API routes
 app.use('/api', routes);
 
