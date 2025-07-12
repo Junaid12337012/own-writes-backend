@@ -60,6 +60,12 @@ app.use(helmet({
 }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
+// Health check route
+app.get('/ping', (req, res) => {
+  res.status(200).send('PONG ✅');
+});
+
+
 // API routes
 app.use('/api', routes);
 
