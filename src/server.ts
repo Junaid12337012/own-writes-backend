@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middlewares/errorHandler';
 import routes from './routes';
+import { cacheControl } from './middleware/cacheControl';
 
 // Load env vars
 dotenv.config({ debug: false });
@@ -51,14 +52,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
+app.use(helmet());
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cors({ origin: true, credentials: true }));
-app.use(helmet({
-  // Allow cross-origin pop-ups (e.g. Google OAuth) to communicate back via postMessage
-  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
-}));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
+app.use(cacheControl); // Add cache control middleware
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500 // limit each IP to 500 requests per windowMs
+});
+app.use(limiter);
 
 // API routes
 app.use('/api', routes);
